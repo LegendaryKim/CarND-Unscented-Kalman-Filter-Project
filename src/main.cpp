@@ -26,8 +26,29 @@ std::string hasData(std::string s) {
   return "";
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+  // output
+  ofstream outfile;
+  if (argc > 1){
+    outfile.open(argv[1], ofstream::out);
+    outfile << "x_true" << ",";
+    outfile << "y_true" << ",";
+    outfile << "vx_true" << ",";
+    outfile << "vy_true" << ",";
+    outfile << "x_est" << ",";
+    outfile << "y_est" << ",";
+    outfile << "vx_est" << ",";
+    outfile << "vy_est" << ",";
+    outfile << "sensor" << ",";
+    outfile << "nis" << ",";
+    outfile << "RMSE_x" << ",";
+    outfile << "RMSE_y" << ",";
+    outfile << "RMSE_vx" << ",";
+    outfile << "RMSE_vy" << std::endl;
+  }
+
+
   uWS::Hub h;
 
   // Create a Kalman Filter instance
@@ -38,7 +59,8 @@ int main()
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
 
-  h.onMessage([&ukf,&tools,&estimations,&ground_truth](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+//  h.onMessage([&ukf,&tools,&estimations,&ground_truth](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+    h.onMessage([&ukf,&tools,&estimations,&ground_truth,&outfile](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -139,6 +161,28 @@ int main()
           auto msg = "42[\"estimate_marker\"," + msgJson.dump() + "]";
           // std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+
+
+          //output
+          if(outfile.is_open()){
+            outfile << fixed << setprecision(4) << x_gt << ",";
+            outfile << fixed << setprecision(4) << y_gt << ",";
+            outfile << fixed << setprecision(4) << vx_gt << ",";
+            outfile << fixed << setprecision(4) << vy_gt << ",";
+            outfile << fixed << setprecision(4) << p_x << ",";
+            outfile << fixed << setprecision(4) << p_y << ",";
+            outfile << fixed << setprecision(4) << v1 << ",";
+            outfile << fixed << setprecision(4) << v2 << ",";
+            outfile << sensor_type << ",";
+            double nis;
+            if (sensor_type.compare("L") == 0) nis = ukf.NIS_laser;
+            else if (sensor_type.compare("R") == 0) nis = ukf.NIS_radar;
+            outfile << fixed << setprecision(4) << nis << ",";
+            outfile << fixed << setprecision(4) << RMSE(0) << ",";
+            outfile << fixed << setprecision(4) << RMSE(1) << ",";
+            outfile << fixed << setprecision(4) << RMSE(2) << ",";
+            outfile << fixed << setprecision(4) << RMSE(3) << std::endl;
+          }
 	  
         }
       } else {
@@ -185,6 +229,11 @@ int main()
     return -1;
   }
   h.run();
+
+  //output
+  if (outfile.is_open()){
+    outfile.close();
+  }
 }
 
 

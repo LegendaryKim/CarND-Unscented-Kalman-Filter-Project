@@ -116,6 +116,15 @@ public:
 
 
   void UpdateUKF(MeasurementPackage meas_package, MatrixXd Zsig, int n_z);
+
+
+  /**
+   * Angle normalization to [-pi, pi]
+   * @param angle
+   */
+  void NormalAng(double *angle);
 };
+
+
 
 #endif /* UKF_H */

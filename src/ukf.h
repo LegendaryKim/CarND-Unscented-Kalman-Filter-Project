@@ -125,6 +125,4 @@ public:
   void NormalAng(double *angle);
 };
 
-
-
 #endif /* UKF_H */

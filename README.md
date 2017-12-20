@@ -54,6 +54,8 @@ OUTPUT: values provided by the c++ program to the simulator
 ![alt text][image1]
 ![alt text][image2]
 
+Here is the [output video](.Output/SensorFusion_UnscentedKalmanFilter.mov)
+
 ## Rubrics
 
 ### Compiling
